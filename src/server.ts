@@ -1,27 +1,31 @@
-import express from 'express';
+import "reflect-metadata";
+import express, { Request, Response, NextFunction } from "express";
+import "express-async-errors";
+import cors from "cors";
+import { router } from "./routes";
 
-// @types/express
+import "./database";
+
 const app = express();
+app.use(cors());
 
-/**
- * GET    => Buscar informação
- * POST   => Insere informação (cria)
- * PUT    => Altera informação
- * DELETE => Remove dado
- * PATCH  => Altera informações especificas
- */
+app.use(express.json());
 
+app.use(router);
 
-app.get("/test", (request, response) => {
-    //request => entra
-    //response => sai
-    return response.send("Olá NLW");
-});
+app.use(
+    (err: Error, request: Request, response: Response, next: NextFunction) => {
+        if (err instanceof Error) {
+            return response.status(400).json({
+                error: err.message,
+            });
+        }
 
-app.post("/test-post", (request, response) => {
+        return response.status(500).json({
+            status: "error",
+            message: "Internal Server Error",
+        });
+    }
+);
 
-    return response.send("Olá NLW método POST");
-});
-
-// http://localhost:3000
 app.listen(3000, () => console.log("Server is running"));
